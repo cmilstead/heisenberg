@@ -159,6 +159,25 @@ add_action( 'wp_enqueue_scripts', 'heisenberg_scripts' );
 
 
 /**
+ * Disable Auto Paragraphs
+ *
+ * @link https://codex.wordpress.org/Function_Reference/wpautop
+ */
+remove_filter( 'the_content', 'wpautop' );
+remove_filter( 'the_excerpt', 'wpautop' );
+
+
+/**
+ *
+ * Add ACF Options Page
+ *
+ */
+if( function_exists('acf_add_options_page') ) {
+	acf_add_options_page();
+}
+
+
+/**
  * Custom template tags for this theme.
  */
 require get_template_directory() . '/inc/template-tags.php';
