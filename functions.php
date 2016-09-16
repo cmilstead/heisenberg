@@ -237,3 +237,121 @@ add_filter( 'login_headertitle', 'heisenberg_change_login_logo_title' );
 function heisenberg_change_login_logo_title() {
 	return get_bloginfo( 'name' );
 }
+
+/**
+ * Register meta box for color options.
+ *
+ * @link https://developer.wordpress.org/reference/functions/add_meta_box/
+ */
+function mb_colors_register_meta_boxes() {
+    add_meta_box( 'mb-colors', 'Brand Colors', 'mb_colors_display', array('page','post'), 'side', 'low' );
+}
+add_action( 'add_meta_boxes', 'mb_colors_register_meta_boxes' );
+
+/**
+ * Meta box display callback.
+ *
+ * @param WP_Post $post Current post object.
+ */
+function mb_colors_display( $post ) {
+	//wp_nonce_field( basename( __FILE__ ), 'mb_colors_nonce' );
+
+	echo '<p>Click color to copy hex to clipboard.</p>';
+
+	echo '<div class="color-select clipboard bg-red" data-clipboard-text="#ED5549">#ed5549</div>';
+	echo '<div class="color-select clipboard bg-black" data-clipboard-text="#111f32">#111f32</div>';
+}
+
+function add_color_scripts( $hook ) {
+
+  global $post;
+  wp_enqueue_script(  'clipboard-js', get_stylesheet_directory_uri().'/assets/js/clipboard.min.js', null, null, true );
+
+	wp_register_style('heisenberg_admin', get_stylesheet_directory_uri().'/assets/dist/css/admin.css');
+	wp_enqueue_style('heisenberg_admin');
+}
+add_action( 'admin_enqueue_scripts', 'add_color_scripts', 10, 1 );
+
+/*******************************************************************************
+* Shortcode for Social Media
+*******************************************************************************/
+
+add_filter('widget_text', 'do_shortcode');
+
+function social_shortcode($atts) {
+	$output = '<div class="social">';
+
+	if(have_rows('social_media', 'option')):
+		while(have_rows('social_media', 'option')): the_row();
+			$output .= '<a href="'.get_sub_field('url').'" class="fa social fa-'.get_sub_field('media').'" title=""></a>';
+		endwhile;
+	endif;
+
+	$output .= '</div>';
+
+	return $output;
+}
+add_shortcode('social_media', 'social_shortcode');
+
+function contact_shortcode($atts) {
+	if($atts['id'] == 'address') {
+		$output = get_field('address', 'option').' '.get_field('city','option').', '.get_field('state','option').' '.get_field('zip', 'option');
+	} elseif($atts['id'] == 'email') {
+		$output = get_field('email','option');
+	} elseif($atts['id'] == 'phone') {
+		$output = get_field('phone_number', 'option');
+	}
+
+	return $output;
+}
+add_shortcode('contact','contact_shortcode');
+
+function logo_shortcode($atts) {
+
+	$file = file_get_contents( get_template_directory() . '/assets/img/svg/'.$atts['type'].'-'.$atts['id'].'.svg' );
+	if(isset($atts['class'])) { $class = $atts['class']; } else { $class = ''; }
+	if($file) {
+		if(isset($atts['alt'])) {
+			print '<div class="logo alt '.$atts['type'].'-'.$atts['id'].' '.$class.'">';
+		} else {
+			print '<div class="logo '.$atts['type'].'-'.$atts['id'].' '.$class.'">';
+		}
+
+		print $file;
+
+		print '</div>';
+	} else {
+		print 'A matching logo could not be found.';
+	}
+
+}
+add_shortcode('logo', 'logo_shortcode');
+
+function block_shortcode($atts) {
+	if(isset($atts['id'])) {
+		if($atts['id'] == 'our_people') {
+			$output = '';
+
+			$args = array(
+				'post_type' => 'people'
+			);
+			$loop = new WP_Query($args);
+
+			while($loop->have_posts()): $loop->the_post();
+				$output .= '<div class="small-10 medium-4 large-3 people">';
+					if(get_field('photo')):	  			$output .= '<div class="photo"><img src="'.get_field('photo').'" /></div>'; endif;
+																					$output .= '<h4 class="name">'.get_field('first_name').' '.get_field('last_name').'</h4>';
+				  if(get_field('position')):			$output .= '<div class="position">'.get_field('position').'</div>'; endif;
+					if(get_field('email')):	    		$output .= '<div class="email"><a href="mailto:'.get_field('email').'">'.get_field('email').'</a></div>'; endif;
+					if(get_field('phone_number')):	$output .= '<div class="phone">'.get_field('phone_number').'</div>'; endif;
+				$output .= '</div>';
+			endwhile;
+
+			wp_reset_postdata();
+
+		}
+	}
+	return $output;
+}
+
+add_shortcode('block', 'block_shortcode');

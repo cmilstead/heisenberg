@@ -6,30 +6,26 @@
  *
  * @link https://developer.wordpress.org/themes/basics/template-files/#template-partials
  *
- * @package Heisenberg
+ * @package heisenberg
  */
 ?>
 
-			</div><!-- #content -->
+</div><!-- #content -->
 
-			<footer id="colophon" class="site-footer" role="contentinfo">
+<footer class="main" role="contentinfo">
 
-				<div class="column row">
+	<div class="column row">
 
-					<p class="text-center">
-						<svg class="icon">
-							<use xlink:href="#icon-coffee-cup"></use>
-						</svg>
-						Thanks for using Heisneberg!
-					</p>
+		<div class="logo"></div>
 
-				</div><!-- .column.row -->
+		<?php dynamic_sidebar( 'footer' ); ?>
 
-			</footer><!-- #colophon -->
+	</div><!-- .column.row -->
 
-		</div> <!-- .off-canvas-content -->
-	</div><!-- .off-canvas-wrapper-inner -->
-</div><!-- .off-canvas-wrapper -->
+</footer><!-- #colophon -->
+
+</div>
+</div>
 
 <?php wp_footer(); ?>
 </body>

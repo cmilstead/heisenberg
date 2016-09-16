@@ -9,42 +9,48 @@
  *
  * @link https://codex.wordpress.org/Template_Hierarchy
  *
- * @package Heisenberg
+ * @package modobrio
  */
+
+$background = get_field('background');
 
 get_header(); ?>
 
-<div class="row">
+<div class="hero <?php print get_field('hero_disabled') ? 'disabled' : ''; ?>">
+  <div class="row">
+		<?php if(get_field('headline')): ?>
+		<h1><?php the_field('headline'); ?>
+		<?php else: ?>
+		<h1><?php the_title(); ?></h1>
+		<?php endif; ?>
 
-	<div class="medium-8 columns">
+    <?php if($background['type'] == 'video'): ?>
+    <video class="bg" loop="" autoplay="" preload="auto">
+      <source src="<?php print wp_get_attachment_url($background['ID']); ?>" type="<?php print $background['mime_type']; ?>">
+    </video>
+    <?php endif; ?>
+  </div>
+</div>
 
-		<div id="primary" class="content-area">
-			<main id="main" class="site-main" role="main">
+<main id="main" class="site-main" role="main">
 
-				<?php while ( have_posts() ) : the_post(); ?>
+	<?php while ( have_posts() ) : the_post(); ?>
 
-					<?php get_template_part( 'components/content', 'page' ); ?>
+		<?php get_template_part( 'components/content', 'page' ); ?>
 
-					<?php
-						// If comments are open or we have at least one comment, load up the comment template.
-						if ( comments_open() || get_comments_number() ) :
-							comments_template();
-						endif;
-					?>
+	<?php endwhile; // End of the loop. ?>
 
-				<?php endwhile; // End of the loop. ?>
+	<?php get_template_part( 'components/content', 'blocks' ); ?>
 
-			</main><!-- #main -->
-		</div><!-- #primary -->
+</main><!-- #main -->
 
-	</div><!-- .columns -->
-
-	<div class="medium-4 columns">
-
-		<?php get_sidebar(); ?>
-
-	</div><!-- .columns -->
-
-</div><!-- .row -->
+<?php if($background['type'] == 'image') { ?>
+<style>
+	.hero {
+		background: linear-gradient(90deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.4) 100%), url('<?php print wp_get_attachment_url($background['ID']); ?>') no-repeat center!important;
+		background-size: cover!important;
+	}
+</style>
+<?php } ?>
 
 <?php get_footer(); ?>
