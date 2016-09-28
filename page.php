@@ -9,7 +9,7 @@
  *
  * @link https://codex.wordpress.org/Template_Hierarchy
  *
- * @package modobrio
+ * @package heisenberg
  */
 
 $background = get_field('background');
